@@ -162,11 +162,9 @@ func (traceRequest) HandleFinalize(
 	middleware.FinalizeOutput, middleware.Metadata, error,
 ) {
 	req, ok := in.Request.(*smithyhttp.Request)
-	if !ok {
-		return next.HandleFinalize(ctx, in)
+	if ok {
+		log.Tracef("sending AWS request:\n%s", DumpRequest(req.Request))
 	}
-
-	log.Tracef("sending AWS request:\n%s", DumpRequest(req.Request))
 	return next.HandleFinalize(ctx, in)
 }
 
@@ -185,7 +183,7 @@ func (traceResponse) HandleDeserialize(
 
 	resp, ok := out.RawResponse.(*smithyhttp.Response)
 	if ok {
-		log.Tracef("sending AWS request:\n%s", DumpResponse(resp.Response))
+		log.Tracef("received AWS response:\n%s", DumpResponse(resp.Response))
 	}
 	return out, md, err
 }
