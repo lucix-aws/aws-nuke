@@ -142,7 +142,9 @@ type DeleteListIterator struct {
 }
 
 // NewDeleteListIterator will return a new DeleteListIterator.
-func NewDeleteListIterator(svc s3.ListObjectsV2APIClient, input *s3.ListObjectsV2Input, opts ...func(*DeleteListIterator)) BatchDeleteIterator {
+func NewDeleteListIterator(
+	svc s3.ListObjectsV2APIClient, input *s3.ListObjectsV2Input, opts ...func(*DeleteListIterator),
+) BatchDeleteIterator {
 	iter := &DeleteListIterator{
 		Bucket:    input.Bucket,
 		Paginator: s3.NewListObjectsV2Paginator(svc, input),
@@ -259,8 +261,8 @@ func NewBatchDeleteWithClient(s3client DeleteObjectsAPIClient, options ...func(*
 //	}); err != nil {
 //		return err
 //	}
-func NewBatchDelete(c aws.Config, options ...func(*BatchDelete)) *BatchDelete {
-	s3client := s3.NewFromConfig(c)
+func NewBatchDelete(c *aws.Config, options ...func(*BatchDelete)) *BatchDelete {
+	s3client := s3.NewFromConfig(*c)
 	return NewBatchDeleteWithClient(s3client, options...)
 }
 

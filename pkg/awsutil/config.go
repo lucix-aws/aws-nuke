@@ -36,15 +36,16 @@ func (c *Credentials) NewConfig(ctx context.Context, region, serviceType string)
 				serviceType, region))
 		}
 
-		opts = append(opts, config.WithRegion(region))
-		opts = append(opts, config.WithCredentialsProvider(c.awsNewStaticCredentialsV2()))
 		// FUTURE: SDK v2 does not support sideloading of a base endpoint URL
 		//
 		// the only way to force an endpoint from config is to use the
 		// deprecated "v1" endpoint resolver (in the v2 SDK)
 		//
 		// https://github.com/aws/aws-sdk-go-v2/issues/2422
-		opts = append(opts, config.WithEndpointResolver(baseEndpoint{customService.URL}))
+		opts = append(opts,
+			config.WithRegion(region),
+			config.WithCredentialsProvider(c.awsNewStaticCredentialsV2()),
+			config.WithEndpointResolver(baseEndpoint{customService.URL})) //nolint:staticcheck
 
 		if customService.TLSInsecureSkipVerify {
 			client := &http.Client{
@@ -192,6 +193,7 @@ type baseEndpoint struct {
 	url string
 }
 
+//nolint:staticcheck
 func (v baseEndpoint) ResolveEndpoint(service, region string) (aws.Endpoint, error) {
 	return aws.Endpoint{URL: v.url}, nil
 }
